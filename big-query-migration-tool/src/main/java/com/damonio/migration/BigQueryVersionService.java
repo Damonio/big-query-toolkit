@@ -21,7 +21,6 @@ import static com.damonio.migration.Util.*;
 class BigQueryVersionService {
 
     private final BigQueryTemplate bigQueryTemplate;
-    private final BigQueryMigrationConfiguration bigQueryMigrationConfiguration;
 
     void createMigrationHistoryTableIfDoesntExists() {
         var migrationHistoryTableScript = readFileInsideJar("scripts/migration_history_table.sql");

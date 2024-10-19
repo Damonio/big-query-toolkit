@@ -28,7 +28,6 @@ public class Util {
         return CharStreams.toString(new InputStreamReader(inputStream, Charsets.UTF_8));
     }
 
-
     public static String substituteValues(String string, Map<String, String> replacements) {
         var stringSubstitutor = new StringSubstitutor(replacements);
         return stringSubstitutor.replace(string);

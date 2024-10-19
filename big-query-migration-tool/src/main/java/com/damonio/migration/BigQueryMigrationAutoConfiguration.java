@@ -13,6 +13,11 @@ class BigQueryMigrationAutoConfiguration {
     public BigQueryMigrationService bigQueryMigrationService(BigQueryTemplate template, BigQueryVersionService bigQueryVersionService) {
         return new BigQueryMigrationService(template, bigQueryVersionService);
     }
+    @Bean
+    @ConditionalOnMissingBean
+    public BigQueryVersionService bigQueryVersionService(BigQueryTemplate template) {
+        return new BigQueryVersionService(template);
+    }
 
 
 }
