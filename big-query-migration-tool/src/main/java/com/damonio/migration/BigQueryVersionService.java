@@ -23,7 +23,7 @@ class BigQueryVersionService {
     private final BigQueryTemplate bigQueryTemplate;
 
     void createMigrationHistoryTableIfDoesntExists() {
-        var migrationHistoryTableScript = readFileInsideJar("scripts/migration_history_table.sql");
+        var migrationHistoryTableScript = readFileInsideJar("scripts/migration_log_table.sql");
 
         var valuesMap = new HashMap<String, String>();
         valuesMap.put("default_dataset", "test_dataset");
