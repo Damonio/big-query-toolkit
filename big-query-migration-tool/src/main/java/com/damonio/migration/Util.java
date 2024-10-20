@@ -24,7 +24,8 @@ public class Util {
         return Files.readString(resource.getFile().toPath(), StandardCharsets.UTF_8);
     }
 
-    public static List<String> order(char singleRunScripPrefix, List<String> list) {
+    //TODO determine if this will be really required
+    public static List<String> order(char onlyOnceRunPrefix, List<String> list) {
         var toOrder =new ArrayList<>(list);
         toOrder.sort((a, b) -> {
             char prefixA = a.charAt(0);
@@ -33,7 +34,7 @@ public class Util {
             int versionB = Integer.parseInt(b.substring(1, b.indexOf("_")));
 
             if (prefixA != prefixB) {
-                if (prefixA == singleRunScripPrefix) {
+                if (prefixA == onlyOnceRunPrefix) {
                     return -1;
                 } else {
                     return 1;

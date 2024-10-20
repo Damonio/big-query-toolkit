@@ -24,5 +24,6 @@
             <artifactId>commons-text</artifactId>
             <version>1.12.0</version>
         </dependency>
+
     </dependencies>
 </project>
