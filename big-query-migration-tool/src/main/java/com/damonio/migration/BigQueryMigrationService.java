@@ -16,13 +16,17 @@ import java.util.stream.Collectors;
 import static com.damonio.migration.Util.readFile;
 
 @Slf4j
-@RequiredArgsConstructor
-public class BigQueryMigrationService {
+class BigQueryMigrationService {
 
     private final BigQueryTemplate bigQueryTemplate;
     private final BigQueryVersionService bigQueryVersionService;
 
-    @PostConstruct
+    BigQueryMigrationService(BigQueryTemplate bigQueryTemplate, BigQueryVersionService bigQueryVersionService) {
+        this.bigQueryTemplate = bigQueryTemplate;
+        this.bigQueryVersionService = bigQueryVersionService;
+        migrate();
+    }
+
     public void migrate() {
         bigQueryVersionService.createMigrationHistoryTableIfDoesntExists();
         migrateClientScripts();

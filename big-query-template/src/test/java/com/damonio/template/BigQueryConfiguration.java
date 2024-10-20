@@ -1,64 +1,58 @@
 package com.damonio.template;
 
+import com.google.api.gax.core.CredentialsProvider;
+import com.google.api.gax.core.NoCredentialsProvider;
+import com.google.api.gax.rpc.ClientContext;
 import com.google.cloud.NoCredentials;
 import com.google.cloud.bigquery.BigQuery;
 import com.google.cloud.bigquery.BigQueryOptions;
 import com.google.cloud.bigquery.DatasetId;
 import com.google.cloud.bigquery.DatasetInfo;
 import com.google.cloud.bigquery.storage.v1.BigQueryWriteClient;
-import org.jetbrains.annotations.NotNull;
+import com.google.cloud.bigquery.storage.v1.BigQueryWriteSettings;
+import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.testcontainers.containers.BigQueryEmulatorContainer;
 
+import java.io.IOException;
+
 @Configuration
 public class BigQueryConfiguration {
 
+    private final static String PROJECT_NAME = "test_project";
+    private final static String DATASET_NAME = "test_dataset";
+
     @Bean
-    public BigQuery bigQuery() {
+    public BigQuery bigQuery(BigQueryEmulatorContainer container) {
+        var emulatorHttpEndpoint = container.getEmulatorHttpEndpoint();
+        var options = BigQueryOptions.newBuilder().setProjectId(PROJECT_NAME)
+                .setHost(emulatorHttpEndpoint).setLocation(emulatorHttpEndpoint).setCredentials(NoCredentials.getInstance()).build();
+        var bigQuery = options.getService();
+        var datasetInfo = DatasetInfo.newBuilder(DatasetId.of(PROJECT_NAME, DATASET_NAME)).build();
+        bigQuery.create(datasetInfo);
         return bigQuery;
     }
 
     @Bean
-    public BigQueryWriteClient(){
+    @SneakyThrows
+    public BigQueryWriteClient bigQueryWriteClient(BigQueryEmulatorContainer container) {
+        //TODO use the container GRCP endpoint if they expose it in the future
+        var build = BigQueryWriteSettings.newBuilder().setEndpoint("0.0.0.0:9060").setCredentialsProvider(new NoCredentialsProvider()).build();
+        return BigQueryWriteClient.create(build);
     }
+
+    @SneakyThrows
+    private static BigQueryWriteSettings getBuild(ClientContext context)  {
+        return BigQueryWriteSettings.newBuilder().build();
+    }
+
     @Bean
-    public BigQueryWriteClient bigQueryWriteClient() {
-        return bigQueryWriteClient;
-    }
-    private BigQueryWriteClient bigQueryWriteClient;
-
-    private BigQueryEmulatorContainer container = initialize();
-
-    private Boolean initialize() {
-
-    }
-    private BigQuery bigQuery = initialize("test_project", "test_dataset");
-
-    private BigQuery initialize(String projectName, String testDataset) {
-        var container = getBigQueryEmulatorContainer(projectName);
-        var service = client(projectName, container);
-        var datasetInfo = DatasetInfo.newBuilder(DatasetId.of(projectName, testDataset)).build();
-        service.create(datasetInfo);
-        return service;
-    }
-
-    private static BigQuery client(String projectId, BigQueryEmulatorContainer container) {
-        var url = container.getEmulatorHttpEndpoint();
-        var options = BigQueryOptions
-                .newBuilder()
-                .setProjectId(projectId)
-                .setHost(url)
-                .setLocation(url)
-                .setCredentials(NoCredentials.getInstance())
-                .build();
-        return options.getService();
-    }
-
-    private static @NotNull BigQueryEmulatorContainer getBigQueryEmulatorContainer(String testProject) {
+    public BigQueryEmulatorContainer bigQueryEmulatorContainer() {
         var container = new BigQueryEmulatorContainer("ghcr.io/goccy/bigquery-emulator:0.4.3");
-        container.setCommandParts(new String[]{"--project=" + testProject});
+        container.setCommandParts(new String[]{"--project=" + PROJECT_NAME});
         container.start();
         return container;
     }
+
 }

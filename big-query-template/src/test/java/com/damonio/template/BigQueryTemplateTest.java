@@ -20,13 +20,13 @@ class BigQueryTemplateTest extends BaseTest {
 
     @Test
     @SneakyThrows
-    void canStreamData() {
-        var testTable = TestTable.builder().intColumn(1).stringColumn("string").build();
-        bigQueryTemplate.stream(testTable);
+    void canDefaultStreamData() {
+        bigQueryTemplate.execute("INSERT INTO `test_dataset.test_table` (int_column, string_column) VALUES (1, 'string')");
 
         var fromBigQuery = bigQueryTemplate.execute("SELECT * FROM `test_dataset.test_table`", TestTable.class);
 
-        assertEquals(List.of(testTable), fromBigQuery);
+        var expected = TestTable.builder().intColumn(1).stringColumn("string").build();
+        assertEquals(List.of(expected), fromBigQuery);
 
     }
 }
