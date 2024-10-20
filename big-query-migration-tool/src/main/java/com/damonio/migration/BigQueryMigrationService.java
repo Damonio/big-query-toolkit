@@ -24,28 +24,38 @@ import java.util.stream.Collectors;
 
 import static com.damonio.migration.Util.generateChecksum;
 import static com.damonio.migration.Util.readFile;
+import static com.damonio.migration.Util.readFileInsideJar;
 import static com.damonio.migration.Util.substituteValues;
 
 @Slf4j
-class BigQueryMigrationService {
+public class BigQueryMigrationService {
 
     private final Clock clock;
     private final BigQueryTemplate bigQueryTemplate;
-    private final BigQueryVersionService bigQueryVersionService;
     private final BigQueryMigrationServiceConfiguration bigQueryMigrationServiceConfiguration;
 
-    BigQueryMigrationService(Clock clock, BigQueryTemplate bigQueryTemplate, BigQueryVersionService bigQueryVersionService, BigQueryMigrationServiceConfiguration bigQueryMigrationServiceConfiguration) {
+    public BigQueryMigrationService(Clock clock, BigQueryTemplate bigQueryTemplate, BigQueryMigrationServiceConfiguration bigQueryMigrationServiceConfiguration) {
         this.clock = clock;
         this.bigQueryTemplate = bigQueryTemplate;
-        this.bigQueryVersionService = bigQueryVersionService;
         this.bigQueryMigrationServiceConfiguration = bigQueryMigrationServiceConfiguration;
         migrate();
     }
 
     public void migrate() {
-        bigQueryVersionService.createMigrationHistoryTableIfDoesntExists();
+        createMigrationHistoryTableIfDoesntExists();
         validateNoFailedMigrations();
         migrateClientScripts();
+    }
+
+    void createMigrationHistoryTableIfDoesntExists() {
+        var migrationHistoryTableScript = readFileInsideJar("scripts/migration_log_table.sql");
+
+        var valuesMap = new HashMap<String, String>();
+        valuesMap.put("default_dataset", "test_dataset");
+
+        var resolvedString = substituteValues(migrationHistoryTableScript, valuesMap);
+        log.info("Initializing database using script [{}]", resolvedString);
+        bigQueryTemplate.execute(resolvedString);
     }
 
     private void validateNoFailedMigrations() {
@@ -56,6 +66,7 @@ class BigQueryMigrationService {
     private static class FailedMigrationsFound extends RuntimeException {
     }
 
+    //TODO check if the non only once run scripts checksum matches to skip to run that script
     private void migrateClientScripts() {
         var migrationScripts = getMigrationScripts();
         log.info("Scripts found: [{}]", migrationScripts);
@@ -82,7 +93,8 @@ class BigQueryMigrationService {
         throw new DuplicateOnlyOnceRunScriptsVersionsFound();
     }
 
-    private static class DuplicateOnlyOnceRunScriptsVersionsFound extends RuntimeException {}
+    private static class DuplicateOnlyOnceRunScriptsVersionsFound extends RuntimeException {
+    }
 
     private boolean isOnlyOnceRunScript(String string) {
         return string.startsWith(bigQueryMigrationServiceConfiguration.getOnlyOnceRunPrefix()) && string.contains("_");
@@ -95,7 +107,7 @@ class BigQueryMigrationService {
     @SneakyThrows
     private List<String> getMigrationScripts() {
         var resolver = new PathMatchingResourcePatternResolver();
-        var resources = resolver.getResources("classpath*:"+bigQueryMigrationServiceConfiguration.getScriptLocation()+ File.separator +"*");
+        var resources = resolver.getResources("classpath*:" + bigQueryMigrationServiceConfiguration.getScriptLocation() + File.separator + "*");
         return Arrays.stream(resources).map(Resource::getFilename).collect(Collectors.toList());
     }
 
