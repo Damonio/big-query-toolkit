@@ -9,8 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>big-query-sample-web-app</artifactId>
-
+    <artifactId>big-query-migration-tool-starter</artifactId>
 
     <dependencies>
         <dependency>

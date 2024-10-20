@@ -9,6 +9,6 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>big-query-migration-tool-web</artifactId>
+    <artifactId>big-query-migration-tool-web-app</artifactId>
 
 </project>

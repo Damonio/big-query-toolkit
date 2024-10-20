@@ -1,4 +1,4 @@
-package com.damonio;
+package com.damonio.sample;
 
 import com.google.cloud.NoCredentials;
 import com.google.cloud.bigquery.BigQuery;

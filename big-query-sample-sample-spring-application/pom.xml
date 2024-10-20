@@ -9,20 +9,14 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>big-query-migration-tool</artifactId>
+    <artifactId>big-query-sample-sample-spring-application</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.damonio</groupId>
-            <artifactId>big-query-template</artifactId>
+            <artifactId>big-query-migration-tool-starter</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-text</artifactId>
-            <version>1.12.0</version>
-        </dependency>
-
     </dependencies>
+
 </project>

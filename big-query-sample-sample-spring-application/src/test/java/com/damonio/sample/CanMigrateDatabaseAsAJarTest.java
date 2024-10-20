@@ -1,4 +1,4 @@
-package com.damonio;
+package com.damonio.sample;
 
 import com.damonio.migration.MigrationLog;
 import com.damonio.template.BigQueryTemplate;

@@ -2,7 +2,6 @@ package com.damonio.migration;
 
 
 import com.damonio.template.BigQueryTemplate;
-import com.google.cloud.bigquery.BigQuery;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

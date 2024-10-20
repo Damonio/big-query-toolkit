@@ -1,5 +1,6 @@
-package com.damonio.template;
+package com.damonio.migration.template;
 
+import com.damonio.template.Util;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

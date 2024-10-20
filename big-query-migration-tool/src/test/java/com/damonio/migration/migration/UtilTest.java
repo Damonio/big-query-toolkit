@@ -1,5 +1,6 @@
-package com.damonio.migration;
+package com.damonio.migration.migration;
 
+import com.damonio.migration.Util;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
