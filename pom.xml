@@ -24,7 +24,8 @@
     <modules>
         <module>big-query-template</module>
         <module>big-query-migration-tool</module>
-        <module>big-query-sample-consumer</module>
+        <module>big-query-sample-web-app</module>
+        <module>big-query-migration-tool-web</module>
     </modules>
     <scm>
         <connection/>

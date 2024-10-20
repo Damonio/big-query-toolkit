@@ -9,15 +9,6 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>big-query-sample-consumer</artifactId>
-
-
-    <dependencies>
-        <dependency>
-            <groupId>com.damonio</groupId>
-            <artifactId>big-query-migration-tool</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-    </dependencies>
+    <artifactId>big-query-migration-tool-web</artifactId>
 
 </project>

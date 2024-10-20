@@ -140,7 +140,11 @@ class BigQueryMigrationService {
     }
 
     private String toBigQueryLocalDateTime() {
-        return LocalDateTime.now(clock).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSS"));
+        return getNow().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS"));
+    }
+
+    private LocalDateTime getNow() {
+        return LocalDateTime.now(clock);
     }
 
     @Data
