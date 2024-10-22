@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.ZipFile;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -42,20 +43,20 @@ class GenericMigrationService {
             var credentialsFile = generateCredentialsFileFromCompressedBase64StringCredentials(base64StringCredentials);
             return tryMigrate(credentialsFile, extractedLocation, bigQueryMigrationService);
         } catch (Exception e) {
-            return new MigrationStatus("Failed to create credentials file", toJSON(e));
+            return new MigrationStatus("Failed to create credentials file", asString(e));
         }
     }
 
     @SneakyThrows
-    private static String toJSON(Exception e) {
-        return new ObjectMapper().findAndRegisterModules().writeValueAsString(e);
+    private static String asString(Exception e) {
+        return ExceptionUtils.getStackTrace(e);
     }
 
     private MigrationStatus tryMigrate(Path credentialsFile, String extractedLocation, BigQueryMigrationConfiguration bigQueryMigrationService) {
         try {
             return migrate(credentialsFile, extractedLocation, bigQueryMigrationService);
         } catch (Exception e) {
-            return new MigrationStatus("Failed to migrate", toJSON(e));
+            return new MigrationStatus("Failed to migrate", asString(e));
         } finally {
             deleteUploadedFiles(extractedLocation, credentialsFile);
         }
