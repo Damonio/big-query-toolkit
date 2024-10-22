@@ -1,5 +1,3 @@
-package com.damonio.template;
-
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -27,6 +25,7 @@ class BigQueryTemplateUtilTest {
         var initialString = getExample();
 
         var compressed = compressAndEncodeToBase64(initialString);
+        log.info("Compressed string: [{}]", compressed);
         var decompressed = decompressBase64Encoded(compressed);
 
         assertEquals(initialString, decompressed);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import App from '../../main/typescript/App';
+import App from '../../main/typescript/migration/App';
 
 test('renders learn react link', () => {
   render(<App />);
