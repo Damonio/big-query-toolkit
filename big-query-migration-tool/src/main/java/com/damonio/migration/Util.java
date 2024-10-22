@@ -24,28 +24,6 @@ public class Util {
         return Files.readString(resource.getFile().toPath(), StandardCharsets.UTF_8);
     }
 
-    //TODO determine if this will be really required
-    public static List<String> order(char onlyOnceRunPrefix, List<String> list) {
-        var toOrder =new ArrayList<>(list);
-        toOrder.sort((a, b) -> {
-            char prefixA = a.charAt(0);
-            char prefixB = b.charAt(0);
-            int versionA = Integer.parseInt(a.substring(1, a.indexOf("_")));
-            int versionB = Integer.parseInt(b.substring(1, b.indexOf("_")));
-
-            if (prefixA != prefixB) {
-                if (prefixA == onlyOnceRunPrefix) {
-                    return -1;
-                } else {
-                    return 1;
-                }
-            } else {
-                return Integer.compare(versionA, versionB);
-            }
-        });
-        return toOrder;
-    }
-
     @SneakyThrows
     public static String readFileInsideJar(String path) {
         var resource = new ClassPathResource(path);
