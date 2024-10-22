@@ -67,8 +67,6 @@ class GenericMigrationService {
         }
     }
 
-
-
     private String extractFile(MultipartFile migrationScripts) {
         var zip = saveToTempFolder(migrationScripts);
         return unzipFile(zip);
