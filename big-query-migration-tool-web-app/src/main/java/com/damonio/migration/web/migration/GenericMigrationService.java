@@ -1,18 +1,18 @@
 package com.damonio.migration.web.migration;
 
-//import com.damonio.migration.BigQueryMigrationService;
-//import com.damonio.migration.BigQueryMigrationServiceConfiguration;
-//import com.damonio.template.BigQueryTemplate;
 
 import com.damonio.migration.BigQueryMigrationService;
 import com.damonio.migration.BigQueryMigrationServiceConfiguration;
 import com.damonio.template.BigQueryTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.bigquery.BigQuery;
+import com.google.cloud.bigquery.BigQueryOptions;
 import com.google.common.io.ByteStreams;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.ZipFile;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,21 +24,32 @@ import java.io.FileOutputStream;
 import java.time.Clock;
 import java.util.UUID;
 
+import static com.damonio.template.BigQueryTemplateUtil.generateCredentialsFileFromCompressedBase64StringCredentials;
+import static com.damonio.template.BigQueryTemplateUtil.getServiceAccountCredentials;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 class GenericMigrationService {
 
     private final Clock clock;
 
-    public void migrate(String environmentFileName, String credentials, MultipartFile migrationScripts) {
+    public void migrate(String environmentFileName, String base64StringCredentials, MultipartFile migrationScripts) {
         var extractedLocation = tryExtractFile(migrationScripts);
         var bigQueryMigrationService = tryReadConfigurationFile(environmentFileName, extractedLocation);
-        new BigQueryMigrationService(clock, new BigQueryTemplate(getBigQuery(credentials)), bigQueryMigrationService).migrate();
+        var credentialsFile = generateCredentialsFileFromCompressedBase64StringCredentials(base64StringCredentials);
+        var serviceAccountCredentials = getServiceAccountCredentials(credentialsFile);
+        new BigQueryMigrationService(clock, new BigQueryTemplate(getBigQuery(bigQueryMigrationService, serviceAccountCredentials)), bigQueryMigrationService).migrate();
+        var delete = credentialsFile.toFile().delete();
+        log.info("Credentials file deleted: [{}]", delete);
     }
 
-    private static BigQuery getBigQuery(String credentials) {
-//        BigQuery bigQuery =
-        return null;
+    private static BigQuery getBigQuery(BigQueryMigrationServiceConfiguration bigQueryMigrationService, ServiceAccountCredentials credentials) {
+        return BigQueryOptions.newBuilder()
+                .setCredentials(credentials)
+                .setProjectId(bigQueryMigrationService.getProjectId())
+                .build()
+                .getService();
     }
 
     private String tryExtractFile(MultipartFile migrationScripts) {
@@ -56,7 +67,6 @@ class GenericMigrationService {
             throw new FailedToReadEnvironmentFile(e);
         }
     }
-
 
     @SneakyThrows
     private static BigQueryMigrationServiceConfiguration readConfigurationFile(String environmentFileName, String extractedLocation) {
@@ -91,7 +101,6 @@ class GenericMigrationService {
             ByteStreams.copy(migrationScripts.getInputStream(), o);
         }
     }
-
 }
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)

@@ -1,11 +1,13 @@
 package com.damonio.template;
 
+import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.common.base.CaseFormat;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -33,6 +35,17 @@ public class BigQueryTemplateUtil {
                 outStream.write(str.getBytes(StandardCharsets.UTF_8));
             }
             return baostream.toByteArray();
+        }
+    }
+
+    public static ServiceAccountCredentials generateServiceAccountCredentialsFromCompressedBase64StringCredentials(String base64StringCredentials) {
+        return getServiceAccountCredentials(generateCredentialsFileFromCompressedBase64StringCredentials(base64StringCredentials));
+    }
+
+    @SneakyThrows
+    public static ServiceAccountCredentials getServiceAccountCredentials(Path path) {
+        try (var serviceAccountStream = new FileInputStream(path.toFile())) {
+            return ServiceAccountCredentials.fromStream(serviceAccountStream);
         }
     }
 
