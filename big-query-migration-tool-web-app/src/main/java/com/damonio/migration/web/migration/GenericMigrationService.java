@@ -21,10 +21,13 @@ class GenericMigrationService {
 
     private Clock clock;
 
-    public void migrate(MigrationRequest migrationRequest, MultipartFile migrationScripts) {
+
+    public void migrate(String environment, String credentials, MultipartFile migrationScripts) {
         var location = extractFile(migrationScripts);
         //TODO implement this
-//        new BigQueryMigrationService(clock, new BigQueryTemplate(null), BigQueryMigrationServiceConfiguration.builder().scriptLocation(location).build()).migrate();
+
+        //        new BigQueryMigrationService(clock, new BigQueryTemplate(null), BigQueryMigrationServiceConfiguration.builder().scriptLocation(location).build()).migrate();
+
     }
 
     private String extractFile(MultipartFile migrationScripts) {
@@ -48,4 +51,5 @@ class GenericMigrationService {
         o.close();
         return copy;
     }
+
 }

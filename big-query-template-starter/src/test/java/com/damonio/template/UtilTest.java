@@ -1,4 +1,4 @@
-package com.damonio.migration.template;
+package com.damonio.template;
 
 import com.damonio.template.Util;
 import org.junit.jupiter.api.Test;

@@ -9,28 +9,14 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>big-query-sample-sample-spring-application</artifactId>
+    <artifactId>big-query-template-starter</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.damonio</groupId>
-            <artifactId>big-query-migration-tool-starter</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.damonio</groupId>
-            <artifactId>big-query-template-starter</artifactId>
+            <artifactId>big-query-template</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

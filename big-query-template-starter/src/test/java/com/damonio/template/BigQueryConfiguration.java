@@ -1,4 +1,4 @@
-package com.damonio.migration.template;
+package com.damonio.template;
 
 import com.google.api.gax.core.CredentialsProvider;
 import com.google.api.gax.core.NoCredentialsProvider;

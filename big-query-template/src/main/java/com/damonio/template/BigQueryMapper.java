@@ -7,10 +7,8 @@ import com.google.cloud.bigquery.FieldValueList;
 import com.google.cloud.bigquery.TableResult;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -35,11 +33,6 @@ public class BigQueryMapper {
     private class Column {
         private String name;
         private Object value;
-    }
-
-    @SneakyThrows
-    public static <T> String toJSON(List<T> bigQueryEntities) {
-        return snakeCaseMapper().writeValueAsString(bigQueryEntities);
     }
 
     private static ObjectMapper snakeCaseMapper() {

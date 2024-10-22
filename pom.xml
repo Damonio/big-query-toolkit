@@ -28,6 +28,7 @@
         <module>big-query-migration-tool-web-app</module>
         <module>big-query-migration-tool-starter</module>
         <module>big-query-migration-tool-zip-generator</module>
+        <module>big-query-template-starter</module>
     </modules>
     <scm>
         <connection/>

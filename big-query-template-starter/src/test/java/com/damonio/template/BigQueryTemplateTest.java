@@ -1,6 +1,5 @@
-package com.damonio.migration.template;
+package com.damonio.template;
 
-import com.damonio.template.BigQueryTemplate;
 import lombok.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

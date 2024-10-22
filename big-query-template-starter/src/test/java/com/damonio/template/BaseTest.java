@@ -1,4 +1,4 @@
-package com.damonio.migration.template;
+package com.damonio.template;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.test.context.SpringBootTest;
