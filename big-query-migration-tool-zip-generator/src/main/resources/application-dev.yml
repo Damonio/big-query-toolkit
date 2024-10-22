@@ -1,4 +1,4 @@
-big-query-environment-configurations:
+big-query-migration-configuration:
   project-id: my-project-id
   dataset-id: my-dataset-id
   replacements:

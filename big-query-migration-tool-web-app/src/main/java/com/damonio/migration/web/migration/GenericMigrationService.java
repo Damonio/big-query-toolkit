@@ -3,7 +3,13 @@ package com.damonio.migration.web.migration;
 //import com.damonio.migration.BigQueryMigrationService;
 //import com.damonio.migration.BigQueryMigrationServiceConfiguration;
 //import com.damonio.template.BigQueryTemplate;
+
+import com.damonio.migration.BigQueryMigrationService;
+import com.damonio.migration.BigQueryMigrationServiceConfiguration;
+import com.damonio.migration.Util;
+import com.damonio.template.BigQueryTemplate;
 import com.google.api.client.util.IOUtils;
+import com.google.common.io.ByteStreams;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import net.lingala.zip4j.ZipFile;
@@ -19,15 +25,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 class GenericMigrationService {
 
-    private Clock clock;
+    private final Clock clock;
 
-
-    public void migrate(String environment, String credentials, MultipartFile migrationScripts) {
+    public void migrate(String environmentFileName, String credentials, MultipartFile migrationScripts) {
         var location = extractFile(migrationScripts);
-        //TODO implement this
-
-        //        new BigQueryMigrationService(clock, new BigQueryTemplate(null), BigQueryMigrationServiceConfiguration.builder().scriptLocation(location).build()).migrate();
-
+        var file = Util.readFile(environmentFileName);
+        new BigQueryMigrationService(clock, new BigQueryTemplate(null), BigQueryMigrationServiceConfiguration.builder().scriptLocation(location).build()).migrate();
     }
 
     private String extractFile(MultipartFile migrationScripts) {
@@ -46,10 +49,15 @@ class GenericMigrationService {
     @SneakyThrows
     private File saveToTempFolder(MultipartFile migrationScripts) {
         var copy = File.createTempFile(UUID.randomUUID().toString(), "-scripts.zip");
-        FileOutputStream o = new FileOutputStream(copy);
-        IOUtils.copy(migrationScripts.getInputStream(), o);
-        o.close();
+        copy(migrationScripts, copy);
         return copy;
+    }
+
+    @SneakyThrows
+    private static void copy(MultipartFile migrationScripts, File copy) {
+        try (var o = new FileOutputStream(copy)) {
+            ByteStreams.copy(migrationScripts.getInputStream(), o);
+        }
     }
 
 }

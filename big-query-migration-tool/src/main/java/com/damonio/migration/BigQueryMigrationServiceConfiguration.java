@@ -10,13 +10,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ConfigurationProperties(prefix = "big-query-migration-tool")
+@ConfigurationProperties(prefix = "big-query-migration-configuration")
 public class BigQueryMigrationServiceConfiguration {
     @Builder.Default
     private String onlyOnceRunPrefix = "O";
@@ -24,6 +26,8 @@ public class BigQueryMigrationServiceConfiguration {
     private String scriptLocation = "big-query" + File.separator + "migrations";
     private String projectId;
     private String datasetId;
+    @Builder.Default
+    private Map<String, String> replacements = new HashMap<>();
 
     @PostConstruct
     public void init() {

@@ -17,8 +17,8 @@ class GenericMigrationController {
     private final GenericMigrationService genericMigrationService;
 
     @PostMapping
-    void migrate(@RequestParam("migrationRequest") String environment, @RequestParam("migrationRequest") String credentials, @RequestParam("migrationScripts") MultipartFile migrationScripts) {
-        genericMigrationService.migrate(environment, credentials, migrationScripts);
+    void migrate(@RequestParam("environmentFileName") String environmentFileName, @RequestParam("credentials") String credentials, @RequestParam("migrationScripts") MultipartFile migrationScripts) {
+        genericMigrationService.migrate(environmentFileName, credentials, migrationScripts);
     }
 
 }
