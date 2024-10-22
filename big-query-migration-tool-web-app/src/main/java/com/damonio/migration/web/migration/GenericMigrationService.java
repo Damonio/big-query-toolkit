@@ -1,8 +1,8 @@
 package com.damonio.migration.web.migration;
 
 
-import com.damonio.migration.BigQueryMigrationService;
 import com.damonio.migration.BigQueryMigrationConfiguration;
+import com.damonio.migration.BigQueryMigrationService;
 import com.damonio.template.BigQueryTemplate;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.bigquery.BigQuery;
@@ -38,7 +38,7 @@ class GenericMigrationService {
         var bigQueryMigrationService = tryReadConfigurationFile(environmentFileName, extractedLocation);
         var credentialsFile = generateCredentialsFileFromCompressedBase64StringCredentials(base64StringCredentials);
         var serviceAccountCredentials = getServiceAccountCredentials(credentialsFile);
-        new BigQueryMigrationService(clock, new BigQueryTemplate(getBigQuery(bigQueryMigrationService, serviceAccountCredentials)), bigQueryMigrationService).migrate();
+        new BigQueryMigrationService(clock, "file:" + extractedLocation + File.separator, new BigQueryTemplate(getBigQuery(bigQueryMigrationService, serviceAccountCredentials)), bigQueryMigrationService).migrate();
         var delete = credentialsFile.toFile().delete();
         log.info("Credentials file deleted: [{}]", delete);
     }

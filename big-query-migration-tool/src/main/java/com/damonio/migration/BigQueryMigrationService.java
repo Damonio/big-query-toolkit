@@ -31,11 +31,13 @@ import static com.damonio.migration.MigrationUtil.substituteValues;
 public class BigQueryMigrationService {
 
     private final Clock clock;
+    private final String scriptLocation;
     private final BigQueryTemplate bigQueryTemplate;
     private final BigQueryMigrationConfiguration bigQueryMigrationConfiguration;
 
-    public BigQueryMigrationService(Clock clock, BigQueryTemplate bigQueryTemplate, BigQueryMigrationConfiguration bigQueryMigrationConfiguration) {
+    public BigQueryMigrationService(Clock clock, String scriptLocation, BigQueryTemplate bigQueryTemplate, BigQueryMigrationConfiguration bigQueryMigrationConfiguration) {
         this.clock = clock;
+        this.scriptLocation = scriptLocation;
         this.bigQueryTemplate = bigQueryTemplate;
         this.bigQueryMigrationConfiguration = bigQueryMigrationConfiguration;
         migrate();
@@ -120,7 +122,7 @@ public class BigQueryMigrationService {
     @SneakyThrows
     private List<String> getMigrationScripts() {
         var resolver = new PathMatchingResourcePatternResolver();
-        var resources = resolver.getResources("classpath*:" + bigQueryMigrationConfiguration.getScriptLocation() + File.separator + "*");
+        var resources = resolver.getResources(scriptLocation + bigQueryMigrationConfiguration.getScriptLocation() + File.separator + "*");
         return Arrays.stream(resources).map(Resource::getFilename).collect(Collectors.toList());
     }
 
