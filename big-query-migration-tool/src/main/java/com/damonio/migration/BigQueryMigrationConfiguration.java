@@ -21,7 +21,7 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @ConfigurationProperties(prefix = "big-query-migration-configuration")
-public class BigQueryMigrationServiceConfiguration {
+public class BigQueryMigrationConfiguration {
     @Builder.Default
     private String onlyOnceRunPrefix = "O";
     @Builder.Default

@@ -1,0 +1,5 @@
+big-query-migration-configuration:
+  dataset-id: bigquery-public-data
+  project-id: bigquery-public-data
+  replacements:
+    test-replacement: test-value

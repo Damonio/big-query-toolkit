@@ -13,14 +13,14 @@ class BigQueryMigrationAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public BigQueryMigrationService bigQueryMigrationService(Clock clock, BigQueryTemplate template,
-                                                             BigQueryMigrationServiceConfiguration bigQueryMigrationServiceConfiguration) {
-        return new BigQueryMigrationService(clock, template, bigQueryMigrationServiceConfiguration);
+                                                             BigQueryMigrationConfiguration bigQueryMigrationConfiguration) {
+        return new BigQueryMigrationService(clock, template, bigQueryMigrationConfiguration);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public BigQueryMigrationServiceConfiguration bigQueryMigrationServiceConfiguration() {
-        return new BigQueryMigrationServiceConfiguration();
+    public BigQueryMigrationConfiguration bigQueryMigrationServiceConfiguration() {
+        return new BigQueryMigrationConfiguration();
     }
 
     @Bean

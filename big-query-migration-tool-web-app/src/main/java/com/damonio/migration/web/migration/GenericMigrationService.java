@@ -2,10 +2,8 @@ package com.damonio.migration.web.migration;
 
 
 import com.damonio.migration.BigQueryMigrationService;
-import com.damonio.migration.BigQueryMigrationServiceConfiguration;
+import com.damonio.migration.BigQueryMigrationConfiguration;
 import com.damonio.template.BigQueryTemplate;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.bigquery.BigQuery;
 import com.google.cloud.bigquery.BigQueryOptions;
@@ -24,6 +22,7 @@ import java.io.FileOutputStream;
 import java.time.Clock;
 import java.util.UUID;
 
+import static com.damonio.migration.web.migration.GenericMigrationUtil.readConfigurationFile;
 import static com.damonio.template.BigQueryTemplateUtil.generateCredentialsFileFromCompressedBase64StringCredentials;
 import static com.damonio.template.BigQueryTemplateUtil.getServiceAccountCredentials;
 
@@ -44,7 +43,7 @@ class GenericMigrationService {
         log.info("Credentials file deleted: [{}]", delete);
     }
 
-    private static BigQuery getBigQuery(BigQueryMigrationServiceConfiguration bigQueryMigrationService, ServiceAccountCredentials credentials) {
+    private static BigQuery getBigQuery(BigQueryMigrationConfiguration bigQueryMigrationService, ServiceAccountCredentials credentials) {
         return BigQueryOptions.newBuilder()
                 .setCredentials(credentials)
                 .setProjectId(bigQueryMigrationService.getProjectId())
@@ -60,20 +59,15 @@ class GenericMigrationService {
         }
     }
 
-    private static BigQueryMigrationServiceConfiguration tryReadConfigurationFile(String environmentFileName, String extractedLocation) {
+    private static BigQueryMigrationConfiguration tryReadConfigurationFile(String environmentFileName, String extractedLocation) {
         try {
-            return readConfigurationFile(environmentFileName, extractedLocation);
+            return readConfigurationFile(environmentFileName, extractedLocation, "big-query-migration-configuration");
         } catch (Exception e) {
             throw new FailedToReadEnvironmentFile(e);
         }
     }
 
-    @SneakyThrows
-    private static BigQueryMigrationServiceConfiguration readConfigurationFile(String environmentFileName, String extractedLocation) {
-        var mapper = new ObjectMapper(new YAMLFactory()).findAndRegisterModules();
-        var bigQueryMigrationServiceConfiguration = mapper.readValue(new File(extractedLocation + File.separator + environmentFileName), BigQueryMigrationServiceConfiguration.class);
-        return bigQueryMigrationServiceConfiguration.withScriptLocation(extractedLocation + File.separator + bigQueryMigrationServiceConfiguration.getScriptLocation());
-    }
+
 
     private String extractFile(MultipartFile migrationScripts) {
         var zip = saveToTempFolder(migrationScripts);

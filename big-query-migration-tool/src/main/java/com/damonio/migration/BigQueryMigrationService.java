@@ -32,12 +32,12 @@ public class BigQueryMigrationService {
 
     private final Clock clock;
     private final BigQueryTemplate bigQueryTemplate;
-    private final BigQueryMigrationServiceConfiguration bigQueryMigrationServiceConfiguration;
+    private final BigQueryMigrationConfiguration bigQueryMigrationConfiguration;
 
-    public BigQueryMigrationService(Clock clock, BigQueryTemplate bigQueryTemplate, BigQueryMigrationServiceConfiguration bigQueryMigrationServiceConfiguration) {
+    public BigQueryMigrationService(Clock clock, BigQueryTemplate bigQueryTemplate, BigQueryMigrationConfiguration bigQueryMigrationConfiguration) {
         this.clock = clock;
         this.bigQueryTemplate = bigQueryTemplate;
-        this.bigQueryMigrationServiceConfiguration = bigQueryMigrationServiceConfiguration;
+        this.bigQueryMigrationConfiguration = bigQueryMigrationConfiguration;
         migrate();
     }
 
@@ -93,7 +93,7 @@ public class BigQueryMigrationService {
     }
 
     private String getScript(String migration) {
-        return readFile(bigQueryMigrationServiceConfiguration.getScriptLocation() + File.separator + migration);
+        return readFile(bigQueryMigrationConfiguration.getScriptLocation() + File.separator + migration);
     }
 
     private void validateNotDuplicatedRuns(List<String> filteredNotRunOnlyOnceRunMigrations) {
@@ -110,17 +110,17 @@ public class BigQueryMigrationService {
     }
 
     private boolean isOnlyOnceRunScript(String string) {
-        return string.startsWith(bigQueryMigrationServiceConfiguration.getOnlyOnceRunPrefix()) && string.contains("_");
+        return string.startsWith(bigQueryMigrationConfiguration.getOnlyOnceRunPrefix()) && string.contains("_");
     }
 
     private Integer getOnlyOnceScriptNumber(String migration) {
-        return Integer.parseInt(migration.split(bigQueryMigrationServiceConfiguration.getOnlyOnceRunPrefix())[1].split("_")[0]);
+        return Integer.parseInt(migration.split(bigQueryMigrationConfiguration.getOnlyOnceRunPrefix())[1].split("_")[0]);
     }
 
     @SneakyThrows
     private List<String> getMigrationScripts() {
         var resolver = new PathMatchingResourcePatternResolver();
-        var resources = resolver.getResources("classpath*:" + bigQueryMigrationServiceConfiguration.getScriptLocation() + File.separator + "*");
+        var resources = resolver.getResources("classpath*:" + bigQueryMigrationConfiguration.getScriptLocation() + File.separator + "*");
         return Arrays.stream(resources).map(Resource::getFilename).collect(Collectors.toList());
     }
 
