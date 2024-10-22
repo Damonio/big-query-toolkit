@@ -1,13 +1,14 @@
 import React, {useState} from 'react';
 import './App.css';
 import {Box, Button, TextField} from "@mui/material";
-import MigrationService from "./MigrationService";
+import MigrationGateway, {MigrationStatus} from "./MigrationGateway";
 
 function App() {
     const defaultEnvironmentFileName = "application-dev.yml";
     const [environmentFileName, setEnvironmentFileName] = useState(defaultEnvironmentFileName);
-    const [credentials, setCredentials] = useState("");
+    const [credentials, setCredentials] = useState('');
     const [migrationScripts, setMigrationScripts] = useState(null);
+    const [migrationStatus, setMigrationStatus] = useState<MigrationStatus>(new MigrationStatus());
 
     const handleFileChange = (event: any) => {
         setMigrationScripts(event.target.files[0]);
@@ -31,9 +32,8 @@ function App() {
         migrationDetails.append('credentials', credentials);
         migrationDetails.append('migrationScripts', migrationScripts);
 
-        MigrationService.migrate(migrationDetails).then(data => {
-            if (data) console.log('File uploaded successfully');
-            else console.error('File upload failed');
+        MigrationGateway.migrate(migrationDetails).then(data => {
+            setMigrationStatus(data)
         });
     };
 
@@ -64,6 +64,21 @@ function App() {
                 <input type="file" onChange={handleFileChange}/>
                 <Button onClick={handleUpload} variant="contained">Upload</Button>
             </div>
+            {migrationStatus.message !== '' &&
+                <div>
+                    <TextField
+                        disabled
+                        id="outlined-disabled"
+                        value={migrationStatus.message}
+                    />
+                    <TextField
+                        id="outlined-multiline-static"
+                        value={migrationStatus.exception}
+                        multiline
+                        disabled
+                    />
+                </div>
+            }
         </Box>
     );
 }

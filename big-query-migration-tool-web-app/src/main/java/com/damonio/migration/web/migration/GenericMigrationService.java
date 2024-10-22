@@ -4,6 +4,7 @@ package com.damonio.migration.web.migration;
 import com.damonio.migration.BigQueryMigrationConfiguration;
 import com.damonio.migration.BigQueryMigrationService;
 import com.damonio.template.BigQueryTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.bigquery.BigQuery;
 import com.google.cloud.bigquery.BigQueryOptions;
@@ -21,7 +22,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Path;
 import java.time.Clock;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.damonio.migration.web.migration.GenericMigrationUtil.readConfigurationFile;
@@ -38,11 +38,24 @@ class GenericMigrationService {
     public MigrationStatus migrate(String environmentFileName, String base64StringCredentials, MultipartFile migrationScripts) {
         var extractedLocation = tryExtractFile(migrationScripts);
         var bigQueryMigrationService = tryReadConfigurationFile(environmentFileName, extractedLocation);
-        var credentialsFile = generateCredentialsFileFromCompressedBase64StringCredentials(base64StringCredentials);
+        try {
+            var credentialsFile = generateCredentialsFileFromCompressedBase64StringCredentials(base64StringCredentials);
+            return tryMigrate(credentialsFile, extractedLocation, bigQueryMigrationService);
+        } catch (Exception e) {
+            return new MigrationStatus("Failed to create credentials file", toJSON(e));
+        }
+    }
+
+    @SneakyThrows
+    private static String toJSON(Exception e) {
+        return new ObjectMapper().findAndRegisterModules().writeValueAsString(e);
+    }
+
+    private MigrationStatus tryMigrate(Path credentialsFile, String extractedLocation, BigQueryMigrationConfiguration bigQueryMigrationService) {
         try {
             return migrate(credentialsFile, extractedLocation, bigQueryMigrationService);
         } catch (Exception e) {
-            return new MigrationStatus("FAILED", Optional.of(e));
+            return new MigrationStatus("Failed to migrate", toJSON(e));
         } finally {
             deleteUploadedFiles(extractedLocation, credentialsFile);
         }
@@ -58,7 +71,7 @@ class GenericMigrationService {
     private MigrationStatus migrate(Path credentialsFile, String extractedLocation, BigQueryMigrationConfiguration bigQueryMigrationService) {
         var serviceAccountCredentials = getServiceAccountCredentials(credentialsFile);
         new BigQueryMigrationService(clock, "file:" + extractedLocation + File.separator, new BigQueryTemplate(getBigQuery(bigQueryMigrationService, serviceAccountCredentials)), bigQueryMigrationService).migrate();
-        return new MigrationStatus("SUCCESS", Optional.empty());
+        return new MigrationStatus("SUCCESS", "");
     }
 
     private static BigQuery getBigQuery(BigQueryMigrationConfiguration bigQueryMigrationService, ServiceAccountCredentials credentials) {

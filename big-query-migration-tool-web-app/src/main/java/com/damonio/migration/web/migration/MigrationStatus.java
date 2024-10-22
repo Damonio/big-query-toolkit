@@ -10,6 +10,6 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MigrationStatus {
-    private String status;
-    private Optional<Exception> exception;
+    private String message;
+    private String exception;
 }
