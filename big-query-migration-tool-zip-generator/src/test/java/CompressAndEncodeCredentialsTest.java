@@ -9,14 +9,14 @@ class CompressAndEncodeCredentialsTest {
 
     @Test
     void example() {
-        var yourCredentials = getYourCredentials();
+        var yourCredentials = doNotComitThisFileIfYouPutYourCredentialsHere();
 
         log.info("Your credentials: [{}]", yourCredentials);
 
         assertTrue(true);
     }
 
-    private static @NotNull String getYourCredentials() {
+    private static @NotNull String doNotComitThisFileIfYouPutYourCredentialsHere() {
         return """
                 {
                     "some": "json sample"
