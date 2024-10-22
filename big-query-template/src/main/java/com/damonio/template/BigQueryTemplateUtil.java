@@ -52,7 +52,7 @@ public class BigQueryTemplateUtil {
     @SneakyThrows
     public static Path generateCredentialsFileFromCompressedBase64StringCredentials(String base64StringCredentials) {
         var originalString = decompressBase64Encoded(base64StringCredentials);
-        var tempFile = Files.createTempFile("temp", ".txt");
+        var tempFile = Files.createTempFile("temp", ".json");
         return Files.writeString(tempFile, originalString);
     }
 
