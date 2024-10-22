@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import './App.css';
-import {Box, Button, TextField} from "@mui/material";
+import {Box, Button, TextareaAutosize, TextField} from "@mui/material";
 import MigrationGateway, {MigrationStatus} from "./MigrationGateway";
 
 function App() {
@@ -38,48 +38,53 @@ function App() {
     };
 
     return (
-        <Box
-            component="form"
-            sx={{'& .MuiTextField-root': {m: 1, width: '25ch'}}}
-            noValidate
-            autoComplete="off"
-        >
-            <div>
-                <TextField
-                    required
-                    id="environment-file-name"
-                    label="Environment file name"
-                    defaultValue={defaultEnvironmentFileName}
-                    variant="filled"
-                    onChange={handleEnvironmentFileNameChange}
-                />
-                <TextField
-                    id="compressed-encoded-credentials"
-                    label="Compressed Encoded Credentials"
-                    type="password"
-                    autoComplete="current-password"
-                    variant="filled"
-                    onChange={handleCredentialsChange}
-                />
-                <input type="file" onChange={handleFileChange}/>
-                <Button onClick={handleUpload} variant="contained">Upload</Button>
-            </div>
-            {migrationStatus.message !== '' &&
+        <div>
+            <Box
+                component="form"
+                sx={{'& .MuiTextField-root': {m: 1, width: '25ch'}}}
+                noValidate
+                autoComplete="off"
+            >
                 <div>
                     <TextField
-                        disabled
-                        id="outlined-disabled"
-                        value={migrationStatus.message}
+                        required
+                        id="environment-file-name"
+                        label="Environment file name"
+                        defaultValue={defaultEnvironmentFileName}
+                        variant="filled"
+                        onChange={handleEnvironmentFileNameChange}
                     />
                     <TextField
-                        id="outlined-multiline-static"
-                        value={migrationStatus.exception}
-                        multiline
-                        disabled
+                        id="compressed-encoded-credentials"
+                        label="Compressed Encoded Credentials"
+                        type="password"
+                        autoComplete="current-password"
+                        variant="filled"
+                        onChange={handleCredentialsChange}
                     />
+                    <input type="file" onChange={handleFileChange}/>
+                    <Button onClick={handleUpload} variant="contained">Upload</Button>
                 </div>
-            }
-        </Box>
+                {migrationStatus.message !== '' &&
+                    <div>
+                        <TextField
+                            disabled
+                            id="outlined-disabled"
+                            value={migrationStatus.message}
+                        />
+                        <TextField
+                            id="outlined-multiline-static"
+                            value={migrationStatus.exception}
+                            style={{width: 1500}}
+                            multiline
+                            disabled
+                        />
+                    </div>
+                }
+
+            </Box>
+
+        </div>
     );
 }
 
