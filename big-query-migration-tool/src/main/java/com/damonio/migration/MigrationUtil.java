@@ -11,12 +11,10 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @UtilityClass
-public class Util {
+public class MigrationUtil {
 
     @SneakyThrows
     public static String readFile(String path) {

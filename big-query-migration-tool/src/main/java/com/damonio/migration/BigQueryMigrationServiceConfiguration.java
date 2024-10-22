@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.With;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -15,9 +16,10 @@ import java.util.Map;
 
 @Slf4j
 @Data
-@Builder
+@With
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder(toBuilder = true)
 @ConfigurationProperties(prefix = "big-query-migration-configuration")
 public class BigQueryMigrationServiceConfiguration {
     @Builder.Default

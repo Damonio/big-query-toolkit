@@ -22,10 +22,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.damonio.migration.Util.generateChecksum;
-import static com.damonio.migration.Util.readFile;
-import static com.damonio.migration.Util.readFileInsideJar;
-import static com.damonio.migration.Util.substituteValues;
+import static com.damonio.migration.MigrationUtil.generateChecksum;
+import static com.damonio.migration.MigrationUtil.readFile;
+import static com.damonio.migration.MigrationUtil.readFileInsideJar;
+import static com.damonio.migration.MigrationUtil.substituteValues;
 
 @Slf4j
 public class BigQueryMigrationService {
