@@ -1,0 +1,8 @@
+cors:
+  disable-cors: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
