@@ -4,8 +4,9 @@ import {Box, Button, TextField} from "@mui/material";
 import MigrationService from "./MigrationService";
 
 function App() {
+    const defaultEnvironmentFileName = "application-dev.yml";
+    const [environmentFileName, setEnvironmentFileName] = useState(defaultEnvironmentFileName);
     const [credentials, setCredentials] = useState("");
-    const [environmentFileName, setEnvironmentFileName] = useState("");
     const [migrationScripts, setMigrationScripts] = useState(null);
 
     const handleFileChange = (event: any) => {
@@ -48,7 +49,7 @@ function App() {
                     required
                     id="environment-file-name"
                     label="Environment file name"
-                    defaultValue="application-dev.yml"
+                    defaultValue={defaultEnvironmentFileName}
                     variant="filled"
                     onChange={handleEnvironmentFileNameChange}
                 />
