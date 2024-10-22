@@ -22,10 +22,7 @@ public class BigQueryConfiguration {
 
     private BigQuery initialize(String projectName, String testDataset) {
         var container = getBigQueryEmulatorContainer(projectName);
-        var service = client(projectName, container);
-        var datasetInfo = DatasetInfo.newBuilder(DatasetId.of(projectName, testDataset)).build();
-        service.create(datasetInfo);
-        return service;
+        return client(projectName, container);
     }
 
     private static BigQuery client(String projectId, BigQueryEmulatorContainer container) {

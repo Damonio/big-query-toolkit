@@ -1,0 +1,3 @@
+big-query-migration-configuration:
+    project-id: test_project
+    dataset-id: test_dataset

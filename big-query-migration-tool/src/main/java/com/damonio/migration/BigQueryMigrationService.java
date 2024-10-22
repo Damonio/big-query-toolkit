@@ -2,6 +2,9 @@ package com.damonio.migration;
 
 
 import com.damonio.template.BigQueryTemplate;
+import com.google.cloud.bigquery.BigQuery;
+import com.google.cloud.bigquery.DatasetId;
+import com.google.cloud.bigquery.DatasetInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,12 +34,14 @@ import static com.damonio.migration.MigrationUtil.substituteValues;
 public class BigQueryMigrationService {
 
     private final Clock clock;
+    private final BigQuery bigQuery;
     private final String scriptLocation;
     private final BigQueryTemplate bigQueryTemplate;
     private final BigQueryMigrationConfiguration bigQueryMigrationConfiguration;
 
-    public BigQueryMigrationService(Clock clock, String scriptLocation, BigQueryTemplate bigQueryTemplate, BigQueryMigrationConfiguration bigQueryMigrationConfiguration) {
+    public BigQueryMigrationService(Clock clock, BigQuery bigQuery, String scriptLocation, BigQueryTemplate bigQueryTemplate, BigQueryMigrationConfiguration bigQueryMigrationConfiguration) {
         this.clock = clock;
+        this.bigQuery = bigQuery;
         this.scriptLocation = scriptLocation;
         this.bigQueryTemplate = bigQueryTemplate;
         this.bigQueryMigrationConfiguration = bigQueryMigrationConfiguration;
@@ -44,12 +49,28 @@ public class BigQueryMigrationService {
     }
 
     public void migrate() {
-        createMigrationHistoryTableIfDoesntExists();
+        initializeDataset();
         validateNoFailedMigrations();
         migrateClientScripts();
     }
 
-    void createMigrationHistoryTableIfDoesntExists() {
+    void initializeDataset() {
+        createDatasetIfDoesntExists();
+        createMigrationHistoryTableIfDoesntExists();
+    }
+
+    private void createDatasetIfDoesntExists() {
+        var dataset = bigQuery.getDataset(DatasetId.of(bigQueryMigrationConfiguration.getProjectId(), bigQueryMigrationConfiguration.getDatasetId()));
+        if (dataset != null) {
+            return;
+        }
+        log.info("Project [{}] does not contain the dataset [{}]", bigQueryMigrationConfiguration.getProjectId(), bigQueryMigrationConfiguration.getDatasetId());
+        var build = DatasetInfo.newBuilder(DatasetId.of(bigQueryMigrationConfiguration.getProjectId(), bigQueryMigrationConfiguration.getDatasetId())).build();
+        bigQuery.create(build);
+        log.info("Project [{}] has now dataset [{}]", bigQueryMigrationConfiguration.getProjectId(), bigQueryMigrationConfiguration.getDatasetId());
+    }
+
+    private void createMigrationHistoryTableIfDoesntExists() {
         var migrationHistoryTableScript = readFileInsideJar("scripts/migration_log_table.sql");
 
         var valuesMap = new HashMap<String, String>();
