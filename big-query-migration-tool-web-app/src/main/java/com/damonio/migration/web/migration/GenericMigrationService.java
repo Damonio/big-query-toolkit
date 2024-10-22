@@ -19,7 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.nio.file.Path;
 import java.time.Clock;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.damonio.migration.web.migration.GenericMigrationUtil.readConfigurationFile;
@@ -33,14 +35,30 @@ class GenericMigrationService {
 
     private final Clock clock;
 
-    public void migrate(String environmentFileName, String base64StringCredentials, MultipartFile migrationScripts) {
+    public MigrationStatus migrate(String environmentFileName, String base64StringCredentials, MultipartFile migrationScripts) {
         var extractedLocation = tryExtractFile(migrationScripts);
         var bigQueryMigrationService = tryReadConfigurationFile(environmentFileName, extractedLocation);
         var credentialsFile = generateCredentialsFileFromCompressedBase64StringCredentials(base64StringCredentials);
+        try {
+            return migrate(credentialsFile, extractedLocation, bigQueryMigrationService);
+        } catch (Exception e) {
+            return new MigrationStatus("FAILED", Optional.of(e));
+        } finally {
+            deleteUploadedFiles(extractedLocation, credentialsFile);
+        }
+    }
+
+    private static void deleteUploadedFiles(String extractedLocation, Path credentialsFile) {
+        var deletedCredentialsFile = credentialsFile.toFile().delete();
+        log.info("Credentials file deleted: [{}]", deletedCredentialsFile);
+        var uploadedDecompressedZipDeleted = new File(extractedLocation).delete();
+        log.info("Uploaded scripts deleted: [{}]", uploadedDecompressedZipDeleted);
+    }
+
+    private MigrationStatus migrate(Path credentialsFile, String extractedLocation, BigQueryMigrationConfiguration bigQueryMigrationService) {
         var serviceAccountCredentials = getServiceAccountCredentials(credentialsFile);
         new BigQueryMigrationService(clock, "file:" + extractedLocation + File.separator, new BigQueryTemplate(getBigQuery(bigQueryMigrationService, serviceAccountCredentials)), bigQueryMigrationService).migrate();
-        var delete = credentialsFile.toFile().delete();
-        log.info("Credentials file deleted: [{}]", delete);
+        return new MigrationStatus("SUCCESS", Optional.empty());
     }
 
     private static BigQuery getBigQuery(BigQueryMigrationConfiguration bigQueryMigrationService, ServiceAccountCredentials credentials) {

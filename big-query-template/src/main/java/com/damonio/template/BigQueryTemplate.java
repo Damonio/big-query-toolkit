@@ -30,4 +30,8 @@ public class BigQueryTemplate {
         var tableResult = executeQuery(query);
         return BigQueryMapper.toPojo(tableResult, testTableClass);
     }
+
+    public BigQuery getBigQuery() {
+        return bigQuery;
+    }
 }
