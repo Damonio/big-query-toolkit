@@ -66,21 +66,34 @@ public class BigQueryMigrationService {
     private static class FailedMigrationsFound extends RuntimeException {
     }
 
-    //TODO check if the non only once run scripts checksum matches to skip to run that script
     private void migrateClientScripts() {
-        var migrationScripts = getMigrationScripts();
-        log.info("Scripts found: [{}]", migrationScripts);
+        var allMigrationScriptsFound = getMigrationScripts();
+        log.info("Scripts found: [{}]", allMigrationScriptsFound);
         var appliedMigrations = bigQueryTemplate.execute("SELECT * FROM `test_dataset.migration_log` WHERE successful = FALSE", MigrationLog.class);
         var singleRunScriptsAlreadyExecuted = appliedMigrations.parallelStream().map(MigrationLog::getFileName).filter(this::isOnlyOnceRunScript).toList();
-        migrationScripts.removeAll(singleRunScriptsAlreadyExecuted);
+        allMigrationScriptsFound.removeAll(singleRunScriptsAlreadyExecuted);
         var latestOnlyOnceScriptMigrationNumber = singleRunScriptsAlreadyExecuted.parallelStream().filter(this::isOnlyOnceRunScript).map(this::getOnlyOnceScriptNumber).mapToInt(Integer::intValue).max().orElse(0);
-        var nonOnlyOnceRunScripts = migrationScripts.parallelStream().filter(migration -> !isOnlyOnceRunScript(migration)).toList();
-        var filteredNotRunOnlyOnceRunMigrations = migrationScripts.parallelStream().filter(this::isOnlyOnceRunScript).filter(migration -> getOnlyOnceScriptNumber(migration) > latestOnlyOnceScriptMigrationNumber).toList();
+        var nonOnlyOnceRunScripts = allMigrationScriptsFound.parallelStream().filter(migration -> !isOnlyOnceRunScript(migration)).toList();
+        var nonOnlyOnceRunScriptsWithDifferentChecksum = nonOnlyOnceRunScripts.parallelStream().filter(migration -> needsToBeReRun(migration, appliedMigrations)).toList();
+        var filteredNotRunOnlyOnceRunMigrations = allMigrationScriptsFound.parallelStream().filter(this::isOnlyOnceRunScript).filter(migration -> getOnlyOnceScriptNumber(migration) > latestOnlyOnceScriptMigrationNumber).toList();
         validateNotDuplicatedRuns(filteredNotRunOnlyOnceRunMigrations);
         var scriptsToExecute = new ArrayList<>(filteredNotRunOnlyOnceRunMigrations);
-        scriptsToExecute.addAll(nonOnlyOnceRunScripts);
+        scriptsToExecute.addAll(nonOnlyOnceRunScriptsWithDifferentChecksum);
         log.info("Next scripts will be executed in the following order: [{}]", scriptsToExecute);
         scriptsToExecute.forEach(this::tryExecuteMigration);
+    }
+
+    private boolean needsToBeReRun(String migration, List<MigrationLog> appliedMigrations) {
+        var appliedMigrationsByName = appliedMigrations.parallelStream().collect(Collectors.groupingBy(MigrationLog::getFileName));
+        if (!appliedMigrationsByName.containsKey(migration)) {
+            return true;
+        }
+        var migrationLogs = appliedMigrationsByName.get(migration).get(0);
+        return !migrationLogs.getChecksum().matches(generateChecksum(getScript(migration)));
+    }
+
+    private String getScript(String migration) {
+        return readFile(bigQueryMigrationServiceConfiguration.getScriptLocation() + File.separator + migration);
     }
 
     private void validateNotDuplicatedRuns(List<String> filteredNotRunOnlyOnceRunMigrations) {
@@ -122,7 +135,7 @@ public class BigQueryMigrationService {
 
     private void executeMigration(String fileName) {
         log.info("Migration script [{}]", fileName);
-        var migrationScript = readFile(bigQueryMigrationServiceConfiguration.getScriptLocation() + File.separator + fileName);
+        var migrationScript = getScript(fileName);
         bigQueryTemplate.execute(migrationScript);
         insertSuccessfulMigration(fileName, generateChecksum(migrationScript));
     }

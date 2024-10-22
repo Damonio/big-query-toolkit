@@ -1,10 +1,9 @@
-package com.damonio.migration.web;
+package com.damonio.migration.web.migration;
 
-import com.damonio.migration.BigQueryMigrationService;
-import com.damonio.migration.BigQueryMigrationServiceConfiguration;
-import com.damonio.template.BigQueryTemplate;
+//import com.damonio.migration.BigQueryMigrationService;
+//import com.damonio.migration.BigQueryMigrationServiceConfiguration;
+//import com.damonio.template.BigQueryTemplate;
 import com.google.api.client.util.IOUtils;
-import com.google.cloud.bigquery.BigQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import net.lingala.zip4j.ZipFile;
@@ -25,7 +24,7 @@ class GenericMigrationService {
     public void migrate(MigrationRequest migrationRequest, MultipartFile migrationScripts) {
         var location = extractFile(migrationScripts);
         //TODO implement this
-        new BigQueryMigrationService(clock, new BigQueryTemplate(null), BigQueryMigrationServiceConfiguration.builder().scriptLocation(location).build()).migrate();
+//        new BigQueryMigrationService(clock, new BigQueryTemplate(null), BigQueryMigrationServiceConfiguration.builder().scriptLocation(location).build()).migrate();
     }
 
     private String extractFile(MultipartFile migrationScripts) {

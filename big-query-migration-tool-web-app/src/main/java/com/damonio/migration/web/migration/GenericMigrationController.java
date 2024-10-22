@@ -1,19 +1,20 @@
-package com.damonio.migration.web;
+package com.damonio.migration.web.migration;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@CrossOrigin
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/migrate")
@@ -21,9 +22,10 @@ class GenericMigrationController {
 
     private final GenericMigrationService genericMigrationService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    void migrate(@RequestPart MigrationRequest migrationRequest, @RequestPart("file") MultipartFile migrationScripts) {
-        genericMigrationService.migrate(migrationRequest, migrationScripts);
+    @PostMapping
+    void migrate(@RequestParam("migrationRequest") String migrationRequest, @RequestParam("migrationScripts") MultipartFile migrationScripts) {
+        System.out.println();
+//        genericMigrationService.migrate(migrationRequest, migrationScripts);
     }
 
 }
