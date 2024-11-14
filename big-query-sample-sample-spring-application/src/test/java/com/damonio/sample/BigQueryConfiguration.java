@@ -1,10 +1,9 @@
 package com.damonio.sample;
 
+import com.damonio.template.BigQueryTemplate;
 import com.google.cloud.NoCredentials;
 import com.google.cloud.bigquery.BigQuery;
 import com.google.cloud.bigquery.BigQueryOptions;
-import com.google.cloud.bigquery.DatasetId;
-import com.google.cloud.bigquery.DatasetInfo;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,9 +17,9 @@ public class BigQueryConfiguration {
         return bigQuery;
     }
 
-    private BigQuery bigQuery = initialize("test_project", "test_dataset");
+    private BigQuery bigQuery = initialize("test_project");
 
-    private BigQuery initialize(String projectName, String testDataset) {
+    private BigQuery initialize(String projectName) {
         var container = getBigQueryEmulatorContainer(projectName);
         return client(projectName, container);
     }
@@ -42,5 +41,10 @@ public class BigQueryConfiguration {
         container.setCommandParts(new String[]{"--project=" + testProject});
         container.start();
         return container;
+    }
+
+    @Bean
+    public BigQueryTemplate getBigQuery() {
+        return new BigQueryTemplate(bigQuery);
     }
 }

@@ -2,7 +2,6 @@ package com.damonio.migration;
 
 
 import com.damonio.template.BigQueryTemplate;
-import com.google.cloud.bigquery.BigQuery;
 import com.google.cloud.bigquery.DatasetId;
 import com.google.cloud.bigquery.DatasetInfo;
 import lombok.AllArgsConstructor;
@@ -142,7 +141,7 @@ public class BigQueryMigrationService {
     private List<String> getMigrationScripts() {
         var resolver = new PathMatchingResourcePatternResolver();
         var resources = resolver.getResources(scriptLocation + bigQueryMigrationConfiguration.getScriptLocation() + File.separator + "*");
-        return Arrays.stream(resources).map(Resource::getFilename).collect(Collectors.toList());
+        return Arrays.stream(resources).map(Resource::getFilename).collect(Collectors.toCollection(ArrayList::new));
     }
 
     private void tryExecuteMigration(String fileName) {
@@ -170,7 +169,7 @@ public class BigQueryMigrationService {
     }
 
     private void insertMigration(String fileName, String status, String checksum) {
-        var nextMigration = bigQueryTemplate.execute("SELECT COUNT(1) AS count FROM `test_dataset.migration_log`", MigrationCountHolder.class).get(0).getCount() + 1;
+        var nextMigration = bigQueryTemplate.execute("SELECT COALESCE(MAX(install_rank), 0) AS max_install_rank FROM `test_dataset.migration_log`", MigrationCountHolder.class).get(0).getMaxInstallRank() + 1;
 
         var valuesMap = new HashMap<String, String>();
         valuesMap.put("nextInstallRank", Integer.toString(nextMigration));
@@ -196,7 +195,7 @@ public class BigQueryMigrationService {
     @NoArgsConstructor
     @AllArgsConstructor
     private static class MigrationCountHolder {
-        private Integer count;
+        private Integer maxInstallRank;
     }
 
     private static String insertQuery() {
